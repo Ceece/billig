@@ -8,9 +8,19 @@
 
     <User v-bind:user="user" />
 
+    <form>
+      <div class="form-group">
+        <label for="price-pattern">Price Pattern</label>
+        <input type="text" class="form-control" id="price-pattern" v-model="pricePattern">
+        <small class="form-text text-muted">
+          <span v-html="`Use {{price}} as number`"></span>
+        </small>
+      </div>
+    </form>
+
 		<div class="gallery">
 
-			<div class="gallery-item" v-for="(item) in media" v-bind:key="item.id">
+			<div class="gallery-item" v-for="(item) in mediaWithPrice()" v-bind:key="item.id">
 
         <label :for="item.id" class="gallery-label">
           <img :src="item.image" class="gallery-image" alt="">
@@ -18,22 +28,24 @@
 
         <input class="d-none" type="checkbox" :id="item.id" :value="item" v-model="checkedMedia">
 
-				<label :for="item.id" class="gallery-item-info">
-          <span class="truncate">{{item.caption}}</span>
-				</label>
+        <label :for="item.id" class="gallery-item-info">
+          <span class="truncate">{{item.caption}}</span><br />
+          <span>{{getPrice(item.caption)}}</span>
+        </label>
 
 			</div>
 
 		</div>
 
-    <div class="container footer">
-      <span class="text-muted">Cart should be here.</span>
+    <div class="container footer" v-if="checkedMedia.length">
+      <span class="text-muted">Total Price {{ sumPrice() }}</span>
     </div>
 	</div>
 </template>
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 import User from '@/components/User.vue'
 
 export default {
@@ -43,10 +55,11 @@ export default {
   },
   data: function () {
     return {
-      usernameInput: '',
+      usernameInput: null,
       user: {},
       media: [],
-      checkedMedia: []
+      checkedMedia: [],
+      pricePattern: null
     }
   },
   mounted() {
@@ -57,6 +70,8 @@ export default {
     if (localStorage.media) {
       this.media = JSON.parse(localStorage.media)
     }
+    
+    this.pricePattern = localStorage.pricePattern || 'ราคา {{price}} บาท'
   },
   watch: {
     user(newUser) {
@@ -98,6 +113,21 @@ export default {
           }
         })
       })
+    },
+    mediaWithPrice: function () {
+      return this.media.filter(({ caption }) => this.getPrice(caption))
+    },
+    getPrice: function(caption = '') {
+      const regex = new RegExp(this.pricePattern.replace('{{price}}', '([\\d,]+)').replace(/\s+/g, '\\s+'))
+      const res = caption.match(regex)
+      const price = res && parseInt(res[1].replace(/,/g, ''))
+      return price
+    },
+    sumPrice: function() {
+      const media = this.checkedMedia
+      const prices = _.map(media, ({ caption }) => this.getPrice(caption))
+      const sum = _.sum(prices)
+      return media.length > 1 ? `${prices.join(' + ')} = ${sum}` : sum
     }
   }
 }
