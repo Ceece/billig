@@ -3,20 +3,23 @@
     <form class="form-inline" v-on:submit="e => fetchUser(e)">
       <label class="sr-only" for="username">IG Username</label>
       <input type="text" class="form-control mb-2 mr-sm-2" id="username" placeholder="IG Username" v-model="usernameInput">
-      <button type="submit" class="btn btn-primary mb-2">Submit</button>
+      <button type="submit" class="btn btn-primary mb-2"><b-icon icon="search"></b-icon> Search</button>
+      <b-button v-b-modal.settings variant="link">Settings</b-button>
     </form>
+
+    <b-modal id="settings" title="Settings">
+      <form>
+        <div class="form-group">
+          <label for="price-pattern">Price Pattern</label>
+          <input type="text" class="form-control" id="price-pattern" v-model="pricePattern">
+          <small class="form-text text-muted">
+            <span v-html="`Use {{price}} as number`"></span>
+          </small>
+        </div>
+      </form>
+    </b-modal>
 
     <User v-bind:user="user" />
-
-    <form>
-      <div class="form-group">
-        <label for="price-pattern">Price Pattern</label>
-        <input type="text" class="form-control" id="price-pattern" v-model="pricePattern">
-        <small class="form-text text-muted">
-          <span v-html="`Use {{price}} as number`"></span>
-        </small>
-      </div>
-    </form>
 
 		<div class="gallery">
 
@@ -46,12 +49,14 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
+import { BButton, BModal } from 'bootstrap-vue'
 import User from '@/components/User.vue'
 
 export default {
   name: 'NewBill',
   components: {
-    User
+    User,
+    BButton, BModal
   },
   data: function () {
     return {

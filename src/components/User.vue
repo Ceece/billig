@@ -13,8 +13,6 @@
 
 				<h1 class="profile-user-name">{{ user.username }}</h1>
 
-				<button class="btn profile-settings-btn" aria-label="profile settings"><i class="fas fa-cog" aria-hidden="true"></i></button>
-
 			</div>
 
 			<div class="profile-stats">
@@ -39,9 +37,8 @@
 </template>
 
 <script>
-
 export default {
   name: 'User',
-  props: ['user']
+	props: ['user']
 }
 </script>
