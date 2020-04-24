@@ -11,3 +11,12 @@
   background-color: #f5f5f5;
   padding: 24px;
 }
+
+[role="link"] {
+  cursor: pointer;
+}
+
+.column-2 {
+  display: grid;
+  grid-template-columns: auto auto;
+}

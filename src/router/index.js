@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import NewBill from '../views/NewBill.vue'
+import Billing from '../views/Billing.vue'
 import About from '../views/About.vue'
 
 Vue.use(VueRouter)
@@ -8,8 +8,8 @@ Vue.use(VueRouter)
   const routes = [
   {
     path: '/',
-    name: 'NewBill',
-    component: NewBill
+    name: 'Billing',
+    component: Billing
   },
   {
     path: '/about',
