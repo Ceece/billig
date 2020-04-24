@@ -27,7 +27,7 @@
 
 			<div class="profile-bio">
 
-				<p>{{ user.biography}}</p>
+				<p v-html="newline(user.biography)" />
         <p><a :href="user.external_url">{{ user.external_url }}</a></p>
 
 			</div>
@@ -39,6 +39,9 @@
 <script>
 export default {
   name: 'User',
-	props: ['user']
+	props: ['user'],
+	methods: {
+		newline: text => text.replace(/[\r\n]/g, '<br />')
+	}
 }
 </script>
