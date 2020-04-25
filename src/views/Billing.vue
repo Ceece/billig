@@ -28,7 +28,7 @@
 
 		<div class="gallery">
 
-			<div class="gallery-item" v-for="(item, index) in mediaWithPrice()" v-bind:key="item.id"  v-long-press="300" @long-press-start="() => openMedia(item, index)">
+			<div class="gallery-item" v-for="item in mediaWithPrice()" v-bind:key="item.id" @contextmenu="(e) => openMedia(e, item)">
 
         <label :for="item.id" class="gallery-label">
           <img :src="item.image" class="gallery-image" alt="">
@@ -76,7 +76,6 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
-import LongPress from 'vue-directive-long-press'
 import Profile from '@/components/Profile.vue'
 
 
@@ -84,9 +83,6 @@ export default {
   name: 'Billing',
   components: {
     Profile
-  },
-  directives: {
-    'long-press': LongPress
   },
   data: function () {
     return {
@@ -175,7 +171,8 @@ export default {
     clearChecked: function () {
       this.checked = []
     },
-    openMedia (item) {
+    openMedia (e, item) {
+      e.preventDefault()
       this.media = JSON.parse(JSON.stringify(item))
       this.$bvModal.show('media-info')
       if (item.comments === undefined) {
