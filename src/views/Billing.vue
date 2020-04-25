@@ -28,7 +28,7 @@
 
 		<div class="gallery">
 
-			<div class="gallery-item" v-for="(item) in mediaWithPrice()" v-bind:key="item.id">
+			<div class="gallery-item" v-for="(item, index) in mediaWithPrice()" v-bind:key="item.id"  v-long-press="300" @long-press-start="() => openMedia(item, index)">
 
         <label :for="item.id" class="gallery-label">
           <img :src="item.image" class="gallery-image" alt="">
@@ -37,8 +37,10 @@
         <input class="d-none" type="checkbox" :id="item.id" :value="item" v-model="checked">
 
         <label :for="item.id" class="gallery-item-info">
-          <span class="truncate">{{item.caption}}</span><br />
-          <span>{{getPrice(item.caption)}}</span>
+          <div class="truncate">{{item.caption}}</div>
+          <div class="text-center">
+            {{getPrice(item.caption)}} :-
+          </div>
         </label>
 
 			</div>
@@ -55,22 +57,41 @@
         <b-icon icon="x" font-scale="2" v-on:click="clearChecked()" role="link"></b-icon>
       </div>
     </div>
+
+    <b-modal id="media-info" title="Post Info" hide-footer>
+      <div v-if="media.id">
+        <b-img :src="media.image" class="w-100 mb-3" />
+        <span><strong>{{settings.user.username}}</strong></span>
+        <p v-html="newline(media.caption)" />
+        <ul>
+          <li v-for="item in media.comments" v-bind:key="item.id">
+            <strong>{{item.owner.username}}</strong> {{item.text}}
+          </li>
+        </ul>
+      </div>
+    </b-modal>
 	</div>
 </template>
 
 <script>
 import axios from 'axios'
 import _ from 'lodash'
+import LongPress from 'vue-directive-long-press'
 import Profile from '@/components/Profile.vue'
+
 
 export default {
   name: 'Billing',
   components: {
     Profile
   },
+  directives: {
+    'long-press': LongPress
+  },
   data: function () {
     return {
       checked: [],
+      media: {},
       settings: {
         username: null,
         user: {},
@@ -121,7 +142,8 @@ export default {
           return {
             id: node.shortcode,
             caption: node.edge_media_to_caption.edges[0].node.text,
-            image: node.thumbnail_src
+            image: node.thumbnail_src,
+            comments: undefined
           }
         })
       })
@@ -152,7 +174,19 @@ export default {
     },
     clearChecked: function () {
       this.checked = []
-    }
+    },
+    openMedia (item) {
+      this.media = JSON.parse(JSON.stringify(item))
+      this.$bvModal.show('media-info')
+      if (item.comments === undefined) {
+        axios.get(`https://www.instagram.com/graphql/query/?query_id=17852405266163336&shortcode=${item.id}&first=50`)
+        .then(({ data }) => {
+          item.comments = _.map(data.data.shortcode_media.edge_media_to_comment.edges, 'node')
+          this.media = item
+        })
+      }
+    },
+    newline: text => text.replace(/[\r\n]/g, '<br />')
   }
 }
 </script>

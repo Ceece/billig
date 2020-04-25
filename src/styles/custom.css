@@ -20,3 +20,8 @@
   display: grid;
   grid-template-columns: auto auto;
 }
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
